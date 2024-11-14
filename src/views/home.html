@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Números</title>
+</head>
+<body>
+    <h1>Conversor de Número para Texto</h1>
+    
+    <label for="number">Digite um número entre 0 e 999:</label>
+    <input type="number" min="0" max="999" id="number" name="number" required>
+    <button id="convertButton" onclick="convert()">Converter</button>
+
+    <div id="result"></div>
+
+    <script>
+        async function convert() {
+            const number = document.getElementById('number').value;
+
+            if (number && !isNaN(number)) {
+                try {
+                    const response = await fetch('/convert', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ number: number })
+                    });
+
+                    if (!response.ok) {
+                        console.log('Erro na requisição');
+                        return;
+                    }
+
+                    const numberText = await response.json();
+
+                    if (numberText) {
+                        document.getElementById('result').innerHTML = `
+                            O número <strong>${number}</strong> por extenso é: <strong>${numberText}</strong>
+                        `;
+                    } else {
+                        throw new Error('Resposta inesperada do servidor');
+                    }
+                } catch (error) {
+                    alert('Ocorreu um erro ao processar a requisição. Tente novamente.');
+                }
+            } else {
+                alert('Por favor, insira um número válido!');
+            }
+        }
+    </script>
+</body>
+</html>
